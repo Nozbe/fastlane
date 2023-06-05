@@ -21,18 +21,24 @@ describe FastlaneCore do
     Apple Watch - 38mm (66D1BF17-3003-465F-A165-E6E3A565E5EB) (Booted)
 "
       FastlaneCore::Simulator.clear_cache
+
+      rt_response = ""
+      allow(rt_response).to receive(:read).and_return("no\n")
+      allow(Open3).to receive(:popen3).with("xcrun simctl list runtimes").and_yield(nil, rt_response, nil, nil)
     end
 
     it "can launch Simulator.app for a simulator device" do
       device = FastlaneCore::DeviceManager::Device.new(name: 'iPhone 5s',
                                                        udid: '3E67398C-AF70-4D77-A22C-D43AA8623FE3',
+                                                    os_type: 'iOS',
                                                  os_version: '10.0',
                                                       state: 'Shutdown',
                                                is_simulator: true)
 
-      expected_command = "open -a #{FastlaneCore::Helper.xcode_path}Applications/Simulator.app --args -CurrentDeviceUDID #{device.udid}"
+      simulator_path = File.join(FastlaneCore::Helper.xcode_path, 'Applications', 'Simulator.app')
+      expected_command = "open -a #{simulator_path} --args -CurrentDeviceUDID #{device.udid}"
 
-      expect(FastlaneCore::Helper).to receive(:backticks).with(expected_command, print: $verbose)
+      expect(FastlaneCore::Helper).to receive(:backticks).with(expected_command, print: FastlaneCore::Globals.verbose?)
 
       FastlaneCore::Simulator.launch(device)
     end
@@ -40,11 +46,12 @@ describe FastlaneCore do
     it "does not launch Simulator.app for a non-simulator device" do
       device = FastlaneCore::DeviceManager::Device.new(name: 'iPhone 5s',
                                                        udid: '3E67398C-AF70-4D77-A22C-D43AA8623FE3',
+                                                    os_type: 'iOS',
                                                  os_version: '10.0',
                                                       state: 'Shutdown',
                                                is_simulator: false)
 
-      expect(FastlaneCore::Helper).not_to receive(:backticks)
+      expect(FastlaneCore::Helper).not_to(receive(:backticks))
 
       FastlaneCore::Simulator.launch(device)
     end

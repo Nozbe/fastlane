@@ -6,7 +6,7 @@ module Fastlane
       action_name = nil
 
       args.each do |current|
-        if current.include? ":" # that's a key/value which we want to pass to the lane
+        if current.include?(":") # that's a key/value which we want to pass to the lane
           key, value = current.split(":", 2)
           UI.user_error!("Please pass values like this: key:value") unless key.length > 0
           value = CommandLineHandler.convert_value(value)
@@ -33,6 +33,7 @@ module Fastlane
           UI.verbose(caller.join("\n"))
           UI.user_error!("The action '#{action}' is no longer bundled with fastlane. You can install it using `fastlane add_plugin #{action}`")
         else
+          Fastlane::ActionsList.print_suggestions(action)
           UI.user_error!("Action '#{action}' not available, run `fastlane actions` to get a full list")
         end
       end

@@ -1,3 +1,5 @@
+require_relative '../module'
+
 module Spaceship
   module Tunes
     class LanguageConverter
@@ -8,13 +10,19 @@ module Spaceship
           (result || {}).fetch('locale', nil)
         end
 
+        # Converts the Language "UK English" to itc locale en-GB
+        def from_standard_to_itc_locale(from)
+          result = mapping.find { |a| a['name'] == from } || {}
+          return result['itc_locale'] || result['locale']
+        end
+
         # Converts the language short codes: (en-US, de-DE) to the iTC format (English_CA, Brazilian Portuguese)
         def from_standard_to_itc(from)
           result = mapping.find { |a| a['locale'] == from || (a['alternatives'] || []).include?(from) }
           (result || {}).fetch('name', nil)
         end
 
-        # Converts the langauge "UK English" (user facing) to "English_UK" (value)
+        # Converts the language "UK English" (user facing) to "English_UK" (value)
         def from_itc_readable_to_itc(from)
           readable_mapping.each do |key, value|
             return key if value == from
@@ -22,7 +30,7 @@ module Spaceship
           nil
         end
 
-        # Converts the langauge "English_UK" (value) to "UK English" (user facing)
+        # Converts the language "English_UK" (value) to "UK English" (user facing)
         def from_itc_to_itc_readable(from)
           readable_mapping[from]
         end
@@ -45,6 +53,10 @@ end
 class String
   def to_language_code
     Spaceship::Tunes::LanguageConverter.from_itc_to_standard(self)
+  end
+
+  def to_itc_locale
+    Spaceship::Tunes::LanguageConverter.from_standard_to_itc_locale(self)
   end
 
   def to_full_language

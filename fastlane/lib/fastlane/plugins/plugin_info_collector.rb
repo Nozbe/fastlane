@@ -9,8 +9,9 @@ module Fastlane
       author = collect_author(detect_author)
       email = collect_email(detect_email)
       summary = collect_summary
+      details = collect_details
 
-      PluginInfo.new(plugin_name, author, email, summary)
+      PluginInfo.new(plugin_name, author, email, summary, details)
     end
 
     #
@@ -23,7 +24,7 @@ module Fastlane
 
       loop do
         if !first_try || plugin_name.to_s.empty?
-          plugin_name = @ui.input("\nWhat would you like to be the name of your plugin?")
+          plugin_name = @ui.input("What would you like to be the name of your plugin?")
         end
         first_try = false
 
@@ -64,10 +65,9 @@ module Fastlane
 
     # Checks if the gem name is still free on RubyGems
     def gem_name_taken?(name)
-      require 'open-uri'
       require 'json'
       url = "https://rubygems.org/api/v1/gems/#{name}.json"
-      response = JSON.parse(open(url).read)
+      response = JSON.parse(FastlaneCore::Helper.open_uri(url).read)
       return !!response['version']
     rescue
       false
@@ -94,7 +94,7 @@ module Fastlane
     #
 
     def detect_author
-      git_name = Helper.backticks('git config --get user.name', print: $verbose).strip
+      git_name = Helper.backticks('git config --get user.name', print: FastlaneCore::Globals.verbose?).strip
       return git_name.empty? ? nil : git_name
     end
 
@@ -102,7 +102,7 @@ module Fastlane
       return initial_author if author_valid?(initial_author)
       author = nil
       loop do
-        author = @ui.input("\nWhat is the plugin author's name?")
+        author = @ui.input("What is the plugin author's name?")
         break if author_valid?(author)
 
         @ui.message('An author name is required.')
@@ -120,12 +120,12 @@ module Fastlane
     #
 
     def detect_email
-      git_email = Helper.backticks('git config --get user.email', print: $verbose).strip
+      git_email = Helper.backticks('git config --get user.email', print: FastlaneCore::Globals.verbose?).strip
       return git_email.empty? ? nil : git_email
     end
 
     def collect_email(initial_email = nil)
-      return initial_email || @ui.input("\nWhat is the plugin author's email address?")
+      return initial_email || @ui.input("What is the plugin author's email address?")
     end
 
     #
@@ -135,7 +135,7 @@ module Fastlane
     def collect_summary
       summary = nil
       loop do
-        summary = @ui.input("\nPlease enter a short summary of this fastlane plugin:")
+        summary = @ui.input("Please enter a short summary of this fastlane plugin:")
         break if summary_valid?(summary)
 
         @ui.message('A summary is required.')
@@ -146,6 +146,13 @@ module Fastlane
 
     def summary_valid?(summary)
       !summary.to_s.strip.empty?
+    end
+    #
+    # Summary
+    #
+
+    def collect_details
+      return @ui.input("Please enter a detailed description of this fastlane plugin:").to_s
     end
   end
 end

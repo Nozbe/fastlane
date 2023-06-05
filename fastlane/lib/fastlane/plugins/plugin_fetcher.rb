@@ -7,14 +7,13 @@ module Fastlane
     # Returns an array of FastlanePlugin objects
     def self.fetch_gems(search_query: nil)
       require 'json'
-      require 'open-uri'
 
       page = 1
       plugins = []
       loop do
-        url = "https://rubygems.org/api/v1/search.json?query=#{PluginManager.plugin_prefix}#{search_query}&page=#{page}"
+        url = "https://rubygems.org/api/v1/search.json?query=#{PluginManager.plugin_prefix}&page=#{page}"
         FastlaneCore::UI.verbose("RubyGems API Request: #{url}")
-        results = JSON.parse(open(url).read)
+        results = JSON.parse(FastlaneCore::Helper.open_uri(url).read)
         break if results.count == 0
 
         plugins += results.collect do |current|
@@ -25,21 +24,10 @@ module Fastlane
 
       return plugins if search_query.to_s.length == 0
       plugins.keep_if do |current|
-        current.full_name.include?(search_query)
+        current.full_name.include?(search_query) or current.info.include?(search_query)
       end
 
       return plugins
-    end
-
-    def self.update_md_file!(output_path: "docs/AvailablePlugins.md")
-      @plugins = fetch_gems
-
-      template_path = File.join(Fastlane::ROOT, "lib/assets/AvailablePlugins.md.erb")
-      md = ERB.new(File.read(template_path), nil, '<>').result(binding) # http://www.rrn.dk/rubys-erb-templating-system
-
-      puts md
-      File.write(output_path, md)
-      FastlaneCore::UI.success("Successfully written plugin file to '#{output_path}'")
     end
   end
 

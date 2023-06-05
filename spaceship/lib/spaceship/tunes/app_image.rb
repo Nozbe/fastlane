@@ -1,6 +1,8 @@
+require_relative 'tunes_base'
+
 module Spaceship
   module Tunes
-    # Represents an image hosted on iTunes Connect. Used for icons, screenshots, etc
+    # Represents an image hosted on App Store Connect. Used for icons, screenshots, etc
     class AppImage < TunesBase
       HOST_URL = "https://is1-ssl.mzstatic.com/image/thumb"
 
@@ -12,18 +14,14 @@ module Spaceship
 
       attr_accessor :url
 
+      attr_accessor :is_imessage
+
       attr_mapping(
         'assetToken' => :asset_token,
         'sortOrder' => :sort_order,
         'url' => :url,
         'originalFileName' => :original_file_name
       )
-
-      class << self
-        def factory(attrs)
-          self.new(attrs)
-        end
-      end
 
       def reset!(attrs = {})
         update_raw_data!(

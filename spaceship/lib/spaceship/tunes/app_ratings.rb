@@ -1,79 +1,30 @@
+require_relative 'app_review'
+
 module Spaceship
   module Tunes
-    # Represents app ratings from iTunesConnect
+    # Represents app ratings from App Store Connect
     class AppRatings < TunesBase
       # @return (Spaceship::Tunes::Application) A reference to the application
       #   this version is for
       attr_accessor :application
 
-      # @return (Spaceship::Tunes::AppRatingSummary) A summary of the overall ratings for the application
-      attr_accessor :rating_summary
+      # @return (Integer) total number of ratings received
+      attr_accessor :rating_count
 
-      # @return (Hash) mapping country codes to a (Spaceship::Tunes::AppRatingSummary) summary of ratings for that country
-      attr_reader :store_fronts
+      # @return (Integer) total number of one star ratings received
+      attr_accessor :one_star_rating_count
 
-      # @return (Hash) of iTunesConnect version id's to readable version numbers
-      attr_reader :versions
+      # @return (Integer) total number of two star ratings received
+      attr_accessor :two_star_rating_count
 
-      attr_mapping({
-        'versions' => :versions
-      })
+      # @return (Integer) total number of three star ratings received
+      attr_accessor :three_star_rating_count
 
-      class << self
-        # Create a new object based on a hash.
-        # This is used to create a new object based on the server response.
-        def factory(attrs)
-          obj = self.new(attrs)
+      # @return (Integer) total number of four star ratings received
+      attr_accessor :four_star_rating_count
 
-          obj.unfold_rating_summary(attrs['ratings'])
-          obj.unfold_store_fronts(attrs['storeFronts'])
-
-          return obj
-        end
-      end
-
-      def unfold_rating_summary(attrs)
-        unfolded_rating_summary = AppRatingSummary.new(attrs)
-        instance_variable_set(:@rating_summary, unfolded_rating_summary)
-      end
-
-      def unfold_store_fronts(attrs)
-        unfolded_store_fronts = {}
-
-        attrs.each do |info|
-          unfolded_store_fronts[info['countryCode']] = AppRatingSummary.new(info['ratings'])
-        end
-
-        instance_variable_set(:@store_fronts, unfolded_store_fronts)
-      end
-
-      # @return (Array) of raw hashes representing user reviews for the given store front (and optional versionId)
-      def reviews(store_front, versionId = '')
-        client.get_reviews(application.apple_id, application.platform, store_front, versionId)
-      end
-    end
-
-    class AppRatingSummary < TunesBase
-      # @return (Integer) total number of reviews recevied
-      attr_reader :review_count
-
-      # @return (Integer) total number of ratings recevied
-      attr_reader :rating_count
-
-      # @return (Integer) total number of one star ratings recevied
-      attr_reader :one_star_rating_count
-
-      # @return (Integer) total number of two star ratings recevied
-      attr_reader :two_star_rating_count
-
-      # @return (Integer) total number of three star ratings recevied
-      attr_reader :three_star_rating_count
-
-      # @return (Integer) total number of four star ratings recevied
-      attr_reader :four_star_rating_count
-
-      # @return (Integer) total number of five star ratings recevied
-      attr_reader :five_star_rating_count
+      # @return (Integer) total number of five star ratings received
+      attr_accessor :five_star_rating_count
 
       attr_mapping({
         'reviewCount' => :review_count,
@@ -85,22 +36,22 @@ module Spaceship
         'ratingFiveCount' => :five_star_rating_count
       })
 
-      class << self
-        # Create a new object based on a hash.
-        # This is used to create a new object based on the server response.
-        def factory(attrs)
-          obj = self.new(attrs)
-          return obj
-        end
-      end
-
       # @return (Float) the average rating for this summary (rounded to 2 decimal places)
       def average_rating
-        ((self.one_star_rating_count +
-          (self.two_star_rating_count * 2) +
-          (self.three_star_rating_count * 3) +
-          (self.four_star_rating_count * 4) +
-          (self.five_star_rating_count * 5)) / self.rating_count.to_f).round(2)
+        ((one_star_rating_count +
+          (two_star_rating_count * 2) +
+          (three_star_rating_count * 3) +
+          (four_star_rating_count * 4) +
+          (five_star_rating_count * 5)) / rating_count.to_f).round(2)
+      end
+
+      # @return (Array) of Review Objects
+      def reviews(store_front = '', version_id = '', upto_date = nil)
+        raw_reviews = client.get_reviews(application.apple_id, application.platform, store_front, version_id, upto_date)
+        raw_reviews.map do |review|
+          review["value"]["application"] = self.application
+          AppReview.factory(review["value"])
+        end
       end
     end
   end

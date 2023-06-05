@@ -1,3 +1,7 @@
+require_relative 'errors'
+require_relative 'language_item'
+require_relative 'tunes_base'
+
 module Spaceship
   module Tunes
     class AppDetails < TunesBase
@@ -13,10 +17,13 @@ module Spaceship
       # @return (Hash) A hash representing the app name in all languages
       attr_reader :name
 
+      # @return (Hash) A hash representing the subtitle in all languages
+      attr_reader :subtitle
+
       # @return (Hash) A hash representing the privacy URL in all languages
       attr_reader :privacy_url
 
-      # @return (Hash) Some bla bla about privacy
+      # @return (Hash) A hash prepresenting the privacy URL in all languages for Apple TV
       attr_reader :apple_tv_privacy_policy
 
       # Categories (e.g. MZGenre.Business)
@@ -63,6 +70,7 @@ module Spaceship
       def unfold_languages
         {
           name: :name,
+          subtitle: :subtitle,
           privacyPolicyUrl: :privacy_url,
           privacyPolicy: :apple_tv_privacy_policy
         }.each do |json, attribute|
@@ -70,10 +78,10 @@ module Spaceship
         end
       end
 
-      # Push all changes that were made back to iTunes Connect
+      # Push all changes that were made back to App Store Connect
       def save!
         client.update_app_details!(application.apple_id, raw_data)
-      rescue Spaceship::TunesClient::ITunesConnectError => ex
+      rescue Spaceship::Tunes::Error => ex
         if ex.to_s == "operation_failed"
           # That's alright, we get this error message if nothing has changed
         else
@@ -84,39 +92,55 @@ module Spaceship
       # Custom Setters
       #
       def primary_category=(value)
-        value = "MZGenre.#{value}" unless value.include? "MZGenre"
+        value = prefix_apps(value)
+        value = prefix_mzgenre(value)
         super(value)
       end
 
       def primary_first_sub_category=(value)
-        value = "MZGenre.#{value}" unless value.include? "MZGenre"
+        value = prefix_apps(value)
+        value = prefix_mzgenre(value)
         super(value)
       end
 
       def primary_second_sub_category=(value)
-        value = "MZGenre.#{value}" unless value.include? "MZGenre"
+        value = prefix_apps(value)
+        value = prefix_mzgenre(value)
         super(value)
       end
 
       def secondary_category=(value)
-        value = "MZGenre.#{value}" unless value.include? "MZGenre"
+        value = prefix_apps(value)
+        value = prefix_mzgenre(value)
         super(value)
       end
 
       def secondary_first_sub_category=(value)
-        value = "MZGenre.#{value}" unless value.include? "MZGenre"
+        value = prefix_apps(value)
+        value = prefix_mzgenre(value)
         super(value)
       end
 
       def secondary_second_sub_category=(value)
-        value = "MZGenre.#{value}" unless value.include? "MZGenre"
+        value = prefix_apps(value)
+        value = prefix_mzgenre(value)
         super(value)
       end
 
       #####################################################
       # @!group General
       #####################################################
-      def setup
+      def setup; end
+
+      private
+
+      def prefix_mzgenre(value)
+        value.include?("MZGenre") ? value : "MZGenre.#{value}"
+      end
+
+      def prefix_apps(value)
+        return value unless value.include?("Stickers")
+        value.include?("Apps") ? value : "Apps.#{value}"
       end
     end
   end

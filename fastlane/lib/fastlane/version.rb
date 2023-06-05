@@ -1,4 +1,6 @@
 module Fastlane
-  VERSION = '1.103.0'.freeze
-  DESCRIPTION = "The easiest way to automate building and releasing your iOS and Android apps"
+  VERSION = '2.213.0'.freeze
+  DESCRIPTION = "The easiest way to automate beta deployments and releases for your iOS and Android apps".freeze
+  MINIMUM_XCODE_RELEASE = "7.0".freeze
+  RUBOCOP_REQUIREMENT = '1.12.1'.freeze
 end

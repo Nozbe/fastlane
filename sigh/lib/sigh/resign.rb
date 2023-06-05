@@ -1,4 +1,7 @@
 require 'shellwords'
+require 'fastlane_core/globals'
+
+require_relative 'module'
 
 module Sigh
   # Resigns an existing ipa file
@@ -18,6 +21,19 @@ module Sigh
 
     def resign(ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id, use_app_entitlements, keychain_path)
       resign_path = find_resign_path
+
+      if keychain_path
+        keychain_path_absolute = File.expand_path(keychain_path)
+
+        current_keychains = `security list-keychains`
+        current_keychains.delete!("\n")
+
+        unless current_keychains.include?(keychain_path_absolute)
+          previous_keychains = current_keychains
+          `security list-keychains -s #{current_keychains} '#{keychain_path_absolute}'`
+        end
+      end
+
       signing_identity = find_signing_identity(signing_identity)
 
       unless provisioning_profiles.kind_of?(Enumerable)
@@ -27,12 +43,13 @@ module Sigh
       # validate that we have valid values for all these params, we don't need to check signing_identity because `find_signing_identity` will only ever return a valid value
       validate_params(resign_path, ipa, provisioning_profiles)
       entitlements = "-e #{entitlements.shellescape}" if entitlements
-      provisioning_options = provisioning_profiles.map { |fst, snd| "-p #{[fst, snd].compact.map(&:shellescape).join('=')}" }.join(' ')
+
+      provisioning_options = create_provisioning_options(provisioning_profiles)
       version = "-n #{version}" if version
       display_name = "-d #{display_name.shellescape}" if display_name
       short_version = "--short-version #{short_version}" if short_version
       bundle_version = "--bundle-version #{bundle_version}" if bundle_version
-      verbose = "-v" if $verbose
+      verbose = "-v" if FastlaneCore::Globals.verbose?
       bundle_id = "-b '#{new_bundle_id}'" if new_bundle_id
       use_app_entitlements_flag = "--use-app-entitlements" if use_app_entitlements
       specific_keychain = "--keychain-path #{keychain_path.shellescape}" if keychain_path
@@ -50,20 +67,22 @@ module Sigh
         use_app_entitlements_flag,
         verbose,
         bundle_id,
-        ipa.shellescape,
-        specific_keychain
+        specific_keychain,
+        ipa.shellescape # Output path must always be last argument
       ].join(' ')
 
-      puts command.magenta
-      puts `#{command}`
+      puts(command.magenta)
+      puts(`#{command}`)
 
       if $?.to_i == 0
-        UI.success "Successfully signed #{ipa}!"
+        UI.success("Successfully signed #{ipa}!")
         true
       else
-        UI.error "Something went wrong while code signing #{ipa}"
+        UI.error("Something went wrong while code signing #{ipa}")
         false
       end
+    ensure
+      `security list-keychains -s #{previous_keychains}` if previous_keychains
     end
 
     def get_inputs(options, args)
@@ -80,7 +99,7 @@ module Sigh
       keychain_path = options.keychain_path || nil
 
       if options.provisioning_name
-        UI.important "The provisioning_name (-n) option is not applicable to resign. You should use provisioning_profile (-p) instead"
+        UI.important("The provisioning_name (-n) option is not applicable to resign. You should use provisioning_profile (-p) instead")
       end
 
       return ipa, signing_identity, provisioning_profiles, entitlements, version, display_name, short_version, bundle_version, new_bundle_id, use_app_entitlements, keychain_path
@@ -99,9 +118,10 @@ module Sigh
     end
 
     def find_signing_identity(signing_identity)
-      until (signing_identity = sha1_for_signing_identity(signing_identity))
-        UI.error "Couldn't find signing identity '#{signing_identity}'."
-        signing_identity = ask_for_signing_identity
+      signing_identity_input = signing_identity
+      until (signing_identity = sha1_for_signing_identity(signing_identity_input))
+        UI.error("Couldn't find signing identity '#{signing_identity_input}'.")
+        signing_identity_input = ask_for_signing_identity
       end
 
       signing_identity
@@ -111,6 +131,28 @@ module Sigh
       identities = installed_identities
       return signing_identity if identities.keys.include?(signing_identity)
       identities.key(signing_identity)
+    end
+
+    def create_provisioning_options(provisioning_profiles)
+      # provisioning_profiles is passed either a hash (to be able to resign extensions/nested apps):
+      # (in that case the underlying resign.sh expects values given as "-p at.fastlane=/folder/mobile.mobileprovision -p at.fastlane.today=/folder/mobile.mobileprovision")
+      #   {
+      #     "at.fastlane" => "/folder/mobile.mobileprovision",
+      #     "at.fastlane.today" => "/folder/mobile.mobileprovision"
+      #   }
+      # or an array
+      # (resign.sh also takes "-p /folder/mobile.mobileprovision" as a param)
+      #   [
+      #        "/folder/mobile.mobileprovision"
+      #   ]
+      provisioning_profiles.map do |app_id, app_id_prov|
+        if app_id_prov
+          app_id_prov = File.expand_path(app_id_prov)
+        else
+          app_id = File.expand_path(app_id)
+        end
+        "-p #{[app_id, app_id_prov].compact.map(&:shellescape).join('=')}"
+      end.join(' ')
     end
 
     def validate_params(resign_path, ipa, provisioning_profiles)
@@ -134,7 +176,7 @@ module Sigh
     end
 
     def print_available_identities
-      UI.message "Available identities: \n\t#{installed_identity_descriptions.join("\n\t")}\n"
+      UI.message("Available identities: \n\t#{installed_identity_descriptions.join("\n\t")}\n")
     end
 
     def ask_for_signing_identity
