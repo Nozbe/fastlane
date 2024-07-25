@@ -92,7 +92,7 @@ module Spaceship
         self.extend(Spaceship::ConnectAPI::Provisioning::API)
         self.extend(Spaceship::ConnectAPI::Users::API)
 
-        set_indvidual_clients(
+        set_individual_clients(
           cookie: cookie,
           current_team_id: current_team_id,
           token: token,
@@ -157,7 +157,7 @@ module Spaceship
 
         # Updating the tunes and portal clients requires resetting
         # of the clients in the API modules
-        set_indvidual_clients(
+        set_individual_clients(
           cookie: nil,
           current_team_id: nil,
           token: nil,
@@ -168,18 +168,7 @@ module Spaceship
 
       private
 
-      def set_indvidual_clients(cookie: nil, current_team_id: nil, token: nil, tunes_client: nil, portal_client: nil)
-        # This was added by Spaceship::ConnectAPI::IAP::API and is required
-        # to be set for API methods to have a client to send request on
-        if cookie || token || tunes_client
-          self.iap_request_client = Spaceship::ConnectAPI::IAP::Client.new(
-            cookie: cookie,
-            current_team_id: current_team_id,
-            token: token,
-            another_client: tunes_client
-          )
-        end
-
+      def set_individual_clients(cookie: nil, current_team_id: nil, token: nil, tunes_client: nil, portal_client: nil)
         # This was added by Spaceship::ConnectAPI::TestFlight::API and is required
         # to be set for API methods to have a client to send request on
         if cookie || token || tunes_client
