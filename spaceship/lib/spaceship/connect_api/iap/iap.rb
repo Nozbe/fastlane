@@ -313,7 +313,7 @@ module Spaceship
             }
           }
 
-          iap_request_client.post('subscriptions', params)
+          iap_request_client.post('https://api.appstoreconnect.apple.com/v1/subscriptions', params)
         end
 
         def update_subscription(
