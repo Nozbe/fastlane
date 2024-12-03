@@ -24,7 +24,7 @@ module Spaceship
 
         def get_in_app_purchases(app_id:, filter: nil, includes: nil, limit: nil, sort: nil)
           params = iap_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          iap_request_client.get("apps/#{app_id}/inAppPurchasesV2", params)
+          iap_request_client.get("https://api.appstoreconnect.apple.com/v1/apps/#{app_id}/inAppPurchasesV2", params)
         end
 
         def create_in_app_purchase(app_id:, name:, product_id:, in_app_purchase_type:, review_note: nil, family_sharable: nil, available_in_all_territories: nil)
@@ -93,7 +93,7 @@ module Spaceship
             }
           }
 
-          iap_request_client.post("inAppPurchaseSubmissions", params)
+          iap_request_client.post("https://api.appstoreconnect.apple.com/v1/inAppPurchaseSubmissions", params)
         end
 
         #
@@ -107,7 +107,7 @@ module Spaceship
 
         def get_in_app_purchase_localization(localization_id:, includes: nil)
           params = iap_request_client.build_params(includes: includes)
-          iap_request_client.get("inAppPurchaseLocalizations/#{localization_id}", params)
+          iap_request_client.get("https://api.appstoreconnect.apple.com/v1/inAppPurchaseLocalizations/#{localization_id}", params)
         end
 
         def create_in_app_purchase_localization(purchase_id:, locale:, name:, description: nil)
@@ -134,11 +134,11 @@ module Spaceship
             }
           }
 
-          iap_request_client.post('inAppPurchaseLocalizations', params)
+          iap_request_client.post('https://api.appstoreconnect.apple.com/v1/inAppPurchaseLocalizations', params)
         end
 
         def delete_in_app_purchase_localization(localization_id:)
-          iap_request_client.delete("inAppPurchaseLocalizations/#{localization_id}")
+          iap_request_client.delete("https://api.appstoreconnect.apple.com/v1/inAppPurchaseLocalizations/#{localization_id}")
         end
 
         #
@@ -153,13 +153,13 @@ module Spaceship
         def get_in_app_purchase_price_schedules(purchase_id:, includes: nil, limit: nil, fields: nil)
           params = iap_request_client.build_params(includes: includes, limit: limit)
           params[:fields] = fields unless fields.nil?
-          iap_request_client.get("inAppPurchasePriceSchedules/#{purchase_id}", params)
+          iap_request_client.get("https://api.appstoreconnect.apple.com/v1/inAppPurchasePriceSchedules/#{purchase_id}", params)
         end
 
         def get_in_app_purchase_prices(purchase_id:, filter: nil, includes: nil, limit: nil, fields: nil)
           params = iap_request_client.build_params(filter: filter, includes: includes, limit: limit)
           params[:fields] = fields unless fields.nil?
-          iap_request_client.get("inAppPurchasePriceSchedules/#{purchase_id}/manualPrices", params)
+          iap_request_client.get("https://api.appstoreconnect.apple.com/v1/inAppPurchasePriceSchedules/#{purchase_id}/manualPrices", params)
         end
 
         def create_in_app_purchase_price_schedule(purchase_id:, in_app_purchase_price_point_id:, start_date: nil)
@@ -216,7 +216,7 @@ module Spaceship
             entry_count += 1
           end
 
-          iap_request_client.post('inAppPurchasePriceSchedules', params)
+          iap_request_client.post('https://api.appstoreconnect.apple.com/v1/inAppPurchasePriceSchedules', params)
         end
 
         #
@@ -242,7 +242,7 @@ module Spaceship
             }
           }
 
-          iap_request_client.post('inAppPurchaseAppStoreReviewScreenshots', params)
+          iap_request_client.post('https://api.appstoreconnect.apple.com/v1/inAppPurchaseAppStoreReviewScreenshots', params)
         end
 
         def update_in_app_purchase_app_store_review_screenshot(screenshot_id:, source_file_checksum: nil, uploaded: nil)
@@ -260,11 +260,11 @@ module Spaceship
             }
           }
 
-          iap_request_client.patch("inAppPurchaseAppStoreReviewScreenshots/#{screenshot_id}", params)
+          iap_request_client.patch("https://api.appstoreconnect.apple.com/v1/inAppPurchaseAppStoreReviewScreenshots/#{screenshot_id}", params)
         end
 
         def delete_in_app_purchase_app_store_review_screenshot(screenshot_id:)
-          iap_request_client.delete("inAppPurchaseAppStoreReviewScreenshots/#{screenshot_id}")
+          iap_request_client.delete("https://api.appstoreconnect.apple.com/v1/inAppPurchaseAppStoreReviewScreenshots/#{screenshot_id}")
         end
 
         def delete_in_app_purchase(purchase_id:)
@@ -277,12 +277,12 @@ module Spaceship
 
         def get_subscription(purchase_id:, includes: nil)
           params = iap_request_client.build_params(filter: nil, includes: includes, limit: nil, sort: nil)
-          iap_request_client.get("subscriptions/#{purchase_id}", params)
+          iap_request_client.get("https://api.appstoreconnect.apple.com/v1/subscriptions/#{purchase_id}", params)
         end
 
         def get_subscriptions(family_id:, filter: nil, includes: nil, limit: nil, sort: nil)
           params = iap_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          iap_request_client.get("subscriptionGroups/#{family_id}/subscriptions", params)
+          iap_request_client.get("https://api.appstoreconnect.apple.com/v1/subscriptionGroups/#{family_id}/subscriptions", params)
         end
 
         def create_subscription(name:, product_id:, family_id:, available_in_all_territories: nil, family_sharable: nil, review_note: nil, subscription_period: nil, group_level: nil)
@@ -343,7 +343,7 @@ module Spaceship
             }
           }
 
-          iap_request_client.patch("subscriptions/#{purchase_id}", params)
+          iap_request_client.patch("https://api.appstoreconnect.apple.com/v1/subscriptions/#{purchase_id}", params)
         end
 
         def submit_subscription(purchase_id:)
@@ -361,11 +361,11 @@ module Spaceship
             }
           }
 
-          iap_request_client.post("subscriptionSubmissions", params)
+          iap_request_client.post("https://api.appstoreconnect.apple.com/v1/subscriptionSubmissions", params)
         end
 
         def delete_subscription(purchase_id:)
-          iap_request_client.delete("subscriptions/#{purchase_id}")
+          iap_request_client.delete("https://api.appstoreconnect.apple.com/v1/subscriptions/#{purchase_id}")
         end
 
         #
@@ -374,12 +374,12 @@ module Spaceship
 
         def get_subscription_group(family_id:, includes: nil)
           params = iap_request_client.build_params(filter: nil, includes: includes, limit: nil, sort: nil)
-          iap_request_client.get("subscriptionGroups/#{family_id}", params)
+          iap_request_client.get("https://api.appstoreconnect.apple.com/v1/subscriptionGroups/#{family_id}", params)
         end
 
         def get_subscription_groups(app_id:, filter: nil, includes: nil, limit: nil, sort: nil)
           params = iap_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          iap_request_client.get("apps/#{app_id}/subscriptionGroups", params)
+          iap_request_client.get("https://api.appstoreconnect.apple.com/v1/apps/#{app_id}/subscriptionGroups", params)
         end
 
         def create_subscription_group(reference_name:, app_id:)
@@ -400,11 +400,11 @@ module Spaceship
             }
           }
 
-          iap_request_client.post('subscriptionGroups', params)
+          iap_request_client.post('https://api.appstoreconnect.apple.com/v1/subscriptionGroups', params)
         end
 
         def delete_subscription_group(family_id:)
-          iap_request_client.delete("subscriptionGroups/#{family_id}")
+          iap_request_client.delete("https://api.appstoreconnect.apple.com/v1/subscriptionGroups/#{family_id}")
         end
 
         #
@@ -413,12 +413,12 @@ module Spaceship
 
         def get_subscription_group_localization(localization_id:, includes: nil)
           params = iap_request_client.build_params(filter: nil, includes: includes, limit: nil, sort: nil)
-          iap_request_client.get("subscriptionGroupLocalizations/#{localization_id}", params)
+          iap_request_client.get("https://api.appstoreconnect.apple.com/v1/subscriptionGroupLocalizations/#{localization_id}", params)
         end
 
         def get_subscription_group_localizations(family_id:, includes: nil, limit: nil)
           params = iap_request_client.build_params(filter: nil, includes: includes, limit: limit, sort: nil)
-          iap_request_client.get("subscriptionGroups/#{family_id}/subscriptionGroupLocalizations", params)
+          iap_request_client.get("https://api.appstoreconnect.apple.com/v1/subscriptionGroups/#{family_id}/subscriptionGroupLocalizations", params)
         end
 
         def create_subscription_group_localization(custom_app_name:, locale:, name:, family_id:)
@@ -441,7 +441,7 @@ module Spaceship
             }
           }
 
-          iap_request_client.post('subscriptionGroupLocalizations', params)
+          iap_request_client.post('https://api.appstoreconnect.apple.com/v1/subscriptionGroupLocalizations', params)
         end
 
         def update_subscription_group_localization(custom_app_name:, name:, localization_id:)
@@ -456,7 +456,7 @@ module Spaceship
             }
           }
 
-          iap_request_client.patch("subscriptionGroupLocalizations/#{localization_id}", params)
+          iap_request_client.patch("https://api.appstoreconnect.apple.com/v1/subscriptionGroupLocalizations/#{localization_id}", params)
         end
 
         #
@@ -465,7 +465,7 @@ module Spaceship
 
         def get_subscription_availabilities(purchase_id:, filter: nil, includes: nil, limit: nil)
           params = iap_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: nil)
-          iap_request_client.get("subscriptionAvailabilities/#{purchase_id}", params)
+          iap_request_client.get("https://api.appstoreconnect.apple.com/v1/subscriptionAvailabilities/#{purchase_id}", params)
         end
 
         def create_subscription_availability(purchase_id:, available_in_new_territories:, available_territory_ids:)
@@ -491,7 +491,7 @@ module Spaceship
             }
           }
 
-          iap_request_client.post('subscriptionAvailabilities', params)
+          iap_request_client.post('https://api.appstoreconnect.apple.com/v1/subscriptionAvailabilities', params)
         end
 
         #
@@ -500,7 +500,7 @@ module Spaceship
 
         def get_subscription_introductory_offers(app_id:, filter: nil, includes: nil, limit: nil, sort: nil)
           params = iap_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          iap_request_client.get("subscriptions/#{app_id}/introductoryOffers", params)
+          iap_request_client.get("https://api.appstoreconnect.apple.com/v1/subscriptions/#{app_id}/introductoryOffers", params)
         end
 
         def create_subscription_introductory_offer(purchase_id:, duration:, number_of_periods:, offer_mode:, start_date: nil, end_date: nil, territory_id: nil, subscription_price_point_id: nil)
@@ -550,7 +550,7 @@ module Spaceship
             }
           }
 
-          iap_request_client.post('subscriptionIntroductoryOffers', params)
+          iap_request_client.post('https://api.appstoreconnect.apple.com/v1/subscriptionIntroductoryOffers', params)
         end
 
         def update_subscription_introductory_offer(introductory_offer_id:, end_date: nil)
@@ -567,11 +567,11 @@ module Spaceship
             }
           }
 
-          iap_request_client.patch("subscriptionIntroductoryOffers/#{introductory_offer_id}", params)
+          iap_request_client.patch("https://api.appstoreconnect.apple.com/v1/subscriptionIntroductoryOffers/#{introductory_offer_id}", params)
         end
 
         def delete_subscription_introductory_offer(introductory_offer_id:)
-          iap_request_client.delete("subscriptionIntroductoryOffers/#{introductory_offer_id}")
+          iap_request_client.delete("https://api.appstoreconnect.apple.com/v1/subscriptionIntroductoryOffers/#{introductory_offer_id}")
         end
 
         #
@@ -580,7 +580,7 @@ module Spaceship
 
         def get_subscription_prices(app_id:, filter: nil, includes: nil, limit: nil, sort: nil)
           params = iap_request_client.build_params(filter: filter, includes: includes, limit: limit, sort: sort)
-          iap_request_client.get("subscriptions/#{app_id}/prices", params)
+          iap_request_client.get("https://api.appstoreconnect.apple.com/v1/subscriptions/#{app_id}/prices", params)
         end
 
         def create_subscription_price(purchase_id:, price_point_id:, territory_id: nil, preserve_current_price: nil, start_date: nil)
@@ -623,11 +623,11 @@ module Spaceship
             }
           }
 
-          iap_request_client.post('subscriptionPrices', params)
+          iap_request_client.post('https://api.appstoreconnect.apple.com/v1/subscriptionPrices', params)
         end
 
         def delete_subscription_price(subscription_price_id:)
-          iap_request_client.delete("subscriptionPrices/#{subscription_price_id}")
+          iap_request_client.delete("https://api.appstoreconnect.apple.com/v1/subscriptionPrices/#{subscription_price_id}")
         end
 
         #
@@ -636,12 +636,12 @@ module Spaceship
 
         def get_subscription_price_points(purchase_id:, filter: nil, includes: nil, limit: nil)
           params = iap_request_client.build_params(filter: filter, includes: includes, limit: limit)
-          iap_request_client.get("subscriptions/#{purchase_id}/pricePoints", params)
+          iap_request_client.get("https://api.appstoreconnect.apple.com/v1/subscriptions/#{purchase_id}/pricePoints", params)
         end
 
         def get_subscription_price_point_equalizations(price_point_id:, filter: nil, includes: nil, limit: nil)
           params = iap_request_client.build_params(filter: filter, includes: includes, limit: limit)
-          iap_request_client.get("subscriptionPricePoints/#{price_point_id}/equalizations", params)
+          iap_request_client.get("https://api.appstoreconnect.apple.com/v1/subscriptionPricePoints/#{price_point_id}/equalizations", params)
         end
 
         #
@@ -650,12 +650,12 @@ module Spaceship
 
         def get_subscription_localizations(purchase_id:, includes: nil, limit: nil)
           params = iap_request_client.build_params(includes: includes, limit: limit)
-          iap_request_client.get("subscriptions/#{purchase_id}/subscriptionLocalizations", params)
+          iap_request_client.get("https://api.appstoreconnect.apple.com/v1/subscriptions/#{purchase_id}/subscriptionLocalizations", params)
         end
 
         def get_subscription_localization(localization_id:, includes: nil)
           params = iap_request_client.build_params(includes: includes)
-          iap_request_client.get("subscriptionLocalizations/#{localization_id}", params)
+          iap_request_client.get("https://api.appstoreconnect.apple.com/v1/subscriptionLocalizations/#{localization_id}", params)
         end
 
         def create_subscription_localization(purchase_id:, locale:, name:, description: nil)
@@ -682,11 +682,11 @@ module Spaceship
             }
           }
 
-          iap_request_client.post('subscriptionLocalizations', params)
+          iap_request_client.post('https://api.appstoreconnect.apple.com/v1/subscriptionLocalizations', params)
         end
 
         def delete_subscription_localization(localization_id:)
-          iap_request_client.delete("subscriptionLocalizations/#{localization_id}")
+          iap_request_client.delete("https://api.appstoreconnect.apple.com/v1/subscriptionLocalizations/#{localization_id}")
         end
 
         #
@@ -712,7 +712,7 @@ module Spaceship
             }
           }
 
-          iap_request_client.post('subscriptionAppStoreReviewScreenshots', params)
+          iap_request_client.post('https://api.appstoreconnect.apple.com/v1/subscriptionAppStoreReviewScreenshots', params)
         end
 
         def update_subscription_app_store_review_screenshot(screenshot_id:, source_file_checksum: nil, uploaded: nil)
@@ -730,11 +730,11 @@ module Spaceship
             }
           }
 
-          iap_request_client.patch("subscriptionAppStoreReviewScreenshots/#{screenshot_id}", params)
+          iap_request_client.patch("https://api.appstoreconnect.apple.com/v1/subscriptionAppStoreReviewScreenshots/#{screenshot_id}", params)
         end
 
         def delete_subscription_app_store_review_screenshot(screenshot_id:)
-          iap_request_client.delete("subscriptionAppStoreReviewScreenshots/#{screenshot_id}")
+          iap_request_client.delete("https://api.appstoreconnect.apple.com/v1/subscriptionAppStoreReviewScreenshots/#{screenshot_id}")
         end
 
         # def patch_age_rating_declaration(age_rating_declaration_id: nil, attributes: nil)

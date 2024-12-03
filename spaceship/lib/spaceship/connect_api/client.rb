@@ -212,6 +212,17 @@ module Spaceship
             another_client: tunes_client
           )
         end
+
+        # This was added by Spaceship::ConnectAPI::IAP::API and is required
+        # to be set for API methods to have a client to send request on
+        if cookie || token || tunes_client
+          self.iap_request_client = Spaceship::ConnectAPI::IAP::Client.new(
+            cookie: cookie,
+            current_team_id: current_team_id,
+            token: token,
+            another_client: tunes_client
+          )
+        end
       end
     end
   end
