@@ -196,7 +196,7 @@ module Spaceship
         "W0EURJRMC5" => DeveloperIdApplication,
         "CDZ7EMXIZ1" => MacProductionPush,
         "HQ4KP3I34R" => MacDevelopmentPush,
-        "DIVN2GW3XT" => DeveloperIdApplication
+        "DIVN2GW3XT" => DeveloperIdApplication,
         "3RA4WT43AH" => DeveloperIdApplication
       }
 
