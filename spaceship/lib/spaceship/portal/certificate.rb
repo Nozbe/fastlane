@@ -197,6 +197,7 @@ module Spaceship
         "CDZ7EMXIZ1" => MacProductionPush,
         "HQ4KP3I34R" => MacDevelopmentPush,
         "DIVN2GW3XT" => DeveloperIdApplication
+        "3RA4WT43AH" => DeveloperIdApplication
       }
 
       CERTIFICATE_TYPE_IDS = APPLE_CERTIFICATE_TYPE_IDS
