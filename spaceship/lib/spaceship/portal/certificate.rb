@@ -278,7 +278,7 @@ module Spaceship
             types = type_ids.keys
             types += OLDER_IOS_CERTIFICATE_TYPES unless mac
           else
-            types = [CERTIFICATE_TYPE_IDS.key(self)]
+            types = CERTIFICATE_TYPE_IDS.select {|k,v| v == self}.keys
             mac = MAC_CERTIFICATE_TYPE_IDS.values.include?(self)
           end
 
