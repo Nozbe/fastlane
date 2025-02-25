@@ -196,7 +196,8 @@ module Spaceship
         "W0EURJRMC5" => DeveloperIdApplication,
         "CDZ7EMXIZ1" => MacProductionPush,
         "HQ4KP3I34R" => MacDevelopmentPush,
-        "DIVN2GW3XT" => DeveloperIdApplication
+        "DIVN2GW3XT" => DeveloperIdApplication,
+        "3RA4WT43AH" => DeveloperIdApplication
       }
 
       CERTIFICATE_TYPE_IDS = APPLE_CERTIFICATE_TYPE_IDS
@@ -277,7 +278,7 @@ module Spaceship
             types = type_ids.keys
             types += OLDER_IOS_CERTIFICATE_TYPES unless mac
           else
-            types = [CERTIFICATE_TYPE_IDS.key(self)]
+            types = CERTIFICATE_TYPE_IDS.select {|k,v| v == self}.keys
             mac = MAC_CERTIFICATE_TYPE_IDS.values.include?(self)
           end
 
